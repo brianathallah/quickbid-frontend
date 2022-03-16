@@ -1,0 +1,15 @@
+package.json
+package-lock.json
+.gitlab-ci.yml
+yarn.lock
+sonar-project.properties
+netlify.toml
+docker-compose.yml
+README.md
+Dockerfile
+.gitignore
+.env
+.env.development
+public/
+.dockerignore
+.eslintc
