@@ -8,7 +8,7 @@ export const getProductList = async ({ fetcher, params }) =>
     params,
   });
 
-export const getProductBidList = async ({ fetcher, params }) =>
+export const getProductBid = async ({ fetcher, params }) =>
   get({
     url: `${BidURL}/get`,
     fetcher,

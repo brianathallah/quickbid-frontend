@@ -1,10 +1,21 @@
-import { Layout, Col, Row, Form, Input, Button, DatePicker } from "antd";
+/* eslint-disable no-unused-vars */
+import {
+  Layout,
+  Col,
+  Row,
+  Form,
+  Input,
+  Button,
+  DatePicker,
+  PageHeader,
+} from "antd";
 import moment from "moment";
 import "antd/dist/antd.css";
 import React, { useEffect, useState, useCallback } from "react";
-import { userMock } from "../../utils/const";
+import { useSearchParams } from "react-router-dom";
+import { productMock, userMock } from "../../utils/const";
 import { fetcher } from "../../utils/fetcher";
-import { postUploadProduct } from "./fetcher";
+import { postEditProduct, getProductDetail } from "./fetcher";
 import HeaderQuickBid from "../../components/Header";
 
 const { Content, Footer } = Layout;
@@ -26,11 +37,22 @@ const parseStateToRequest = (state, userId) => {
   return request;
 };
 
-function AddProductPage({ history }) {
+function EditProductPage({ history }) {
   const [user, setUser] = useState({});
+  const [product, setProduct] = useState({});
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     setUser(userMock);
+    setProduct(productMock);
+    // const productId = searchParams.get("product_id");
+    // const params = { product_id: productId };
+    // getProductDetail({ fetcher, params }).then((res) => {
+    //   if (res && res.data && res.data.length > 0) {
+    //     const productData = res.data;
+    //     setProduct(productData);
+    //   }
+    // });
   }, []);
 
   const navigateBack = useCallback(() => {
@@ -43,7 +65,7 @@ function AddProductPage({ history }) {
         ...parseStateToRequest(val, user.user_id),
       };
 
-      await postUploadProduct({ fetcher, data }).then((result) => {
+      await postEditProduct({ fetcher, data }).then((result) => {
         if (result.STATUS === "ERROR") return "Error";
         return navigateBack();
       });
@@ -54,7 +76,12 @@ function AddProductPage({ history }) {
   return (
     <Layout className="layout">
       <HeaderQuickBid user={user} />
-      <Content style={{ margin: "50px 100px" }}>
+      <PageHeader
+        title={product.name}
+        subTitle={product.seller_name}
+        style={{ margin: "0px 100px" }}
+      />
+      <Content style={{ margin: "0px 100px" }}>
         <Row gutter={[24, 24]}>
           <Col span={8}>
             <Form
@@ -66,6 +93,7 @@ function AddProductPage({ history }) {
               autoComplete="off"
             >
               <Form.Item
+                initialValue={product.name}
                 label="Product Name"
                 name="name"
                 rules={[
@@ -76,6 +104,7 @@ function AddProductPage({ history }) {
               </Form.Item>
 
               <Form.Item
+                initialValue={product.initial_price}
                 label="Initial Price"
                 name="initialPrice"
                 rules={[
@@ -86,6 +115,7 @@ function AddProductPage({ history }) {
               </Form.Item>
 
               <Form.Item
+                initialValue={product.bid_increment}
                 label="Bid Increment"
                 name="bidIncrement"
                 rules={[
@@ -96,6 +126,7 @@ function AddProductPage({ history }) {
               </Form.Item>
 
               <Form.Item
+                initialValue={product.image_url}
                 label="Image URL"
                 name="imageUrl"
                 rules={[{ required: true, message: "Please input image URL!" }]}
@@ -104,6 +135,7 @@ function AddProductPage({ history }) {
               </Form.Item>
 
               <Form.Item
+                initialValue={moment(product.start_time)}
                 label="Start Time"
                 name="startTime"
                 rules={[
@@ -114,6 +146,7 @@ function AddProductPage({ history }) {
               </Form.Item>
 
               <Form.Item
+                initialValue={moment(product.end_time)}
                 label="End Time"
                 name="endTime"
                 rules={[{ required: true, message: "Please input end time!" }]}
@@ -137,4 +170,4 @@ function AddProductPage({ history }) {
   );
 }
 
-export default AddProductPage;
+export default EditProductPage;

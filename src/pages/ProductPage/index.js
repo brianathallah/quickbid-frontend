@@ -1,18 +1,23 @@
-import { Layout, Menu, Col, Row, Button, Form, Input } from "antd";
+import { Layout, Col, Row, Button, Form, Input, PageHeader } from "antd";
 import "antd/dist/antd.css";
 import moment from "moment";
 import React, { useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
-import { UserTypeBuyer, UserTypeSeller } from "../../utils/const";
-import { getStorageValue } from "../../utils/helpers";
+import {
+  bidMock,
+  productMock,
+  userMock,
+  UserTypeBuyer,
+} from "../../utils/const";
 import { fetcher } from "../../utils/fetcher";
 import {
   getProductDetail,
   postBidValue,
   getProductHighestBid,
 } from "./fetcher";
+import HeaderQuickBid from "../../components/Header";
 
-const { Header, Content, Footer } = Layout;
+const { Content, Footer } = Layout;
 
 function ProductPage() {
   const [user, setUser] = useState({});
@@ -31,12 +36,9 @@ function ProductPage() {
   }, []);
 
   useEffect(() => {
-    const userData = getStorageValue("user", {
-      user_id: 0,
-      user_name: "",
-      user_type: 0,
-    });
-    setUser(userData);
+    setUser(userMock);
+    setProduct(productMock);
+    setProductHighestBid(bidMock);
     const productId = searchParams.get("product_id");
     const params = { product_id: productId };
     getProductDetail({ fetcher, params }).then((res) => {
@@ -65,38 +67,29 @@ function ProductPage() {
   );
   return (
     <Layout className="layout">
-      <Header>
-        <div className="logo" />
-        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={["1"]}>
-          <Menu.Item key={1}>Home</Menu.Item>
-          {user.user_type === UserTypeBuyer && (
-            <Menu.Item key={2}>My Bid</Menu.Item>
-          )}
-          {user.user_type === UserTypeSeller && (
-            <Menu.Item key={2}>My Listing</Menu.Item>
-          )}
-        </Menu>
-      </Header>
-      <Content style={{ padding: "50px 300px" }}>
+      <HeaderQuickBid user={user} />
+      <PageHeader
+        title={product.name}
+        subTitle={product.seller_name}
+        style={{ margin: "0px 100px" }}
+      />
+      <Content style={{ margin: "0px 100px" }}>
         <Row gutter={[24, 24]}>
-          <Col span={8}>
-            <img src={product.img_url} alt="product_image" />
+          <Col span={12}>
+            <img src={product.image_url} alt="product_image" width={400} />
           </Col>
-          <Col span={8}>
-            <div>{product.name}</div>
-          </Col>
-          <Col span={8}>
+          <Col span={12}>
             Highest Bidder
             <br />
-            {productHighestBid.user_name}
+            <b>{productHighestBid.user_name}</b>
             <br />
             {productHighestBid.value} GoPay Coins
+            <br />
             <br />
             {user.user_type === UserTypeBuyer && (
               <Form
                 name="basic"
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 16 }}
+                wrapperCol={{ span: 8 }}
                 initialValues={{ remember: true }}
                 onFinish={handleFinishForm}
                 autoComplete="off"

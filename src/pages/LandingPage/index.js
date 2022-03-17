@@ -1,28 +1,29 @@
-import { Layout, Menu, Card, Col, Row, Tag, Button } from "antd";
+import { Layout, Card, Col, Row, Tag, Button } from "antd";
 import "antd/dist/antd.css";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { UserTypeBuyer, UserTypeSeller } from "../../utils/const";
+import { productMock, userMock, UserTypeSeller } from "../../utils/const";
 import { fetcher } from "../../utils/fetcher";
-import { getProductBidList, getProductList } from "./fetcher";
-import { getStorageValue } from "../../utils/helpers";
+import { getProductBid, getProductList } from "./fetcher";
+import HeaderQuickBid from "../../components/Header";
+// import { getStorageValue } from "../../utils/helpers";
 
-const { Header, Content, Footer } = Layout;
+const { Content, Footer } = Layout;
 const { Meta } = Card;
 
 function LandingPage() {
   const [user, setUser] = useState({});
   const [productList, setProductList] = useState([]);
-  const [productHighestBid, setProductHighestBidList] = useState(0);
 
   const getBidData = useCallback((productId) => {
     const params = { product_id: productId };
-    getProductBidList({ fetcher, params }).then((res) => {
+    getProductBid({ fetcher, params }).then((res) => {
       if (res && res.data && res.data.length > 0) {
         const productBidData = res.data;
-        setProductHighestBidList(productBidData);
+        return productBidData;
       }
+      return 0;
     });
   }, []);
 
@@ -38,12 +39,8 @@ function LandingPage() {
   }, [getBidData]);
 
   useEffect(() => {
-    const userData = getStorageValue("user", {
-      user_id: 0,
-      user_name: "",
-      user_type: 0,
-    });
-    setUser(userData);
+    setUser(userMock);
+    setProductList([{ ...productMock, bid_highest: 1000000000 }]);
   }, [getData]);
 
   const cardMock = (
@@ -71,19 +68,8 @@ function LandingPage() {
 
   return (
     <Layout className="layout">
-      <Header>
-        <div className="logo" />
-        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={["1"]}>
-          <Menu.Item key={1}>Home</Menu.Item>
-          {user.user_type === UserTypeBuyer && (
-            <Menu.Item key={2}>My Bid</Menu.Item>
-          )}
-          {user.user_type === UserTypeSeller && (
-            <Menu.Item key={2}>My Listing</Menu.Item>
-          )}
-        </Menu>
-      </Header>
-      <Content style={{ padding: "50px 300px" }}>
+      <HeaderQuickBid user={user} />
+      <Content style={{ margin: "50px 100px" }}>
         {user.user_type === UserTypeSeller && (
           <Link to="/product/add">
             <Button>Add Product</Button>
@@ -91,10 +77,19 @@ function LandingPage() {
         )}
         <Row gutter={32}>
           <Col span={4}>{cardMock}</Col>
+          <Col span={4}>{cardMock}</Col>
+          <Col span={4}>{cardMock}</Col>
+          <Col span={4}>{cardMock}</Col>
+          <Col span={4}>{cardMock}</Col>
+          <Col span={4}>{cardMock}</Col>
+          <Col span={4}>{cardMock}</Col>
+          <Col span={4}>{cardMock}</Col>
+          <Col span={4}>{cardMock}</Col>
+
           {productList.map((product, i) => (
             // eslint-disable-next-line react/no-array-index-key
             <Col span={4} key={i}>
-              <Link to={`/product/get/${product.id}`}>
+              <Link to="/product/detail">
                 <Card
                   style={{ margin: "20px 0" }}
                   hoverable
@@ -102,7 +97,7 @@ function LandingPage() {
                 >
                   <Meta title={product.name} />
                   <div style={{ margin: "10px 0" }}>
-                    <b>{productHighestBid.value} GPC</b> Highest
+                    <b>{product.bid_highest} GPC</b> Highest
                   </div>
                   <Tag icon={<ExclamationCircleOutlined />} color="error">
                     {product.end_time}

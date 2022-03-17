@@ -1,14 +1,14 @@
-import { Layout, Menu, Card, Col, Row, Tag, Button } from "antd";
+import { Layout, Card, Col, Row, Tag, Button, PageHeader } from "antd";
 import "antd/dist/antd.css";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { UserTypeBuyer, UserTypeSeller } from "../../utils/const";
+import { userMock, UserTypeSeller } from "../../utils/const";
 import { fetcher } from "../../utils/fetcher";
 import { getProductBidList, getProductListByUserID } from "./fetcher";
-import { getStorageValue } from "../../utils/helpers";
+import HeaderQuickBid from "../../components/Header";
 
-const { Header, Content, Footer } = Layout;
+const { Content, Footer } = Layout;
 const { Meta } = Card;
 
 function MyProductPage() {
@@ -38,12 +38,7 @@ function MyProductPage() {
   }, [getBidData, user]);
 
   useEffect(() => {
-    const userData = getStorageValue("user", {
-      user_id: 0,
-      user_name: "",
-      user_type: 0,
-    });
-    setUser(userData);
+    setUser(userMock);
   }, [getData]);
 
   const cardMock = (
@@ -71,19 +66,12 @@ function MyProductPage() {
 
   return (
     <Layout className="layout">
-      <Header>
-        <div className="logo" />
-        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={["1"]}>
-          <Menu.Item key={1}>Home</Menu.Item>
-          {user.user_type === UserTypeBuyer && (
-            <Menu.Item key={2}>My Bid</Menu.Item>
-          )}
-          {user.user_type === UserTypeSeller && (
-            <Menu.Item key={2}>My Listing</Menu.Item>
-          )}
-        </Menu>
-      </Header>
-      <Content style={{ padding: "50px 300px" }}>
+      <HeaderQuickBid user={user} />
+      <PageHeader
+        title={user.user_type === "1" ? "My Bids" : "My Product"}
+        style={{ margin: "0px 100px" }}
+      />
+      <Content style={{ margin: "0px 100px" }}>
         {user.user_type === UserTypeSeller && (
           <Link to="/product/add">
             <Button>Add Product</Button>
